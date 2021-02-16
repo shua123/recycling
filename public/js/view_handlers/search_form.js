@@ -20,7 +20,7 @@
       } else {
         var addressParam = formatAddressRequest(address);
         //var url = "http://maps.googleapis.com/maps/api/geocode/json?address=" + addressParam;
-        var url = "https://gisapps.cityofchicago.org/arcgis/rest/services/GeoStreets/GeocodeServer/findAddressCandidates?category=&outFields=*&outSR=4326&f=json&Street=&ZIP=&SingleLine=" + addressParam
+        var url = "https://gisapps.cityofchicago.org/arcgis/rest/services/GeoStreets/GeocodeServer/findAddressCandidates?maxLocations=5&category=&outFields=*&outSR=4326&f=json&Street=&ZIP=&SingleLine=" + addressParam
         
         /**
          * GET /geocode.json, which is a proxy to the Google
