@@ -11,21 +11,31 @@ var dbCnx = process.env.MONGOLAB_URI || config.db;
 var db = mongoose.connect(dbCnx);
 
 var Location = require('../models/Location');
+var Ward = require('../models/Ward');
 
 var rows = [];
-Location.find({}).populate('reports').exec(function(err, locations){
-  _.each(locations, function(location){
-    _.each(location.reports, function(report){
-      var row = {
-        address: location.address.trim(),
-        comment: report.comment.trim(),
-        date: report.date
-      };
-      rows.push(row);
-    });
-  });
 
-  json2csv({data: rows, fields: ['address', 'date', 'comment']}, function(err, csv){
+Ward.find({}).populate({
+        path: 'locations',
+        populate: { path: 'reports' }
+    }).exec(function(err, wards){
+    _.each(wards, function(ward){
+        _.each(ward.locations, function(location){
+            _.each(location.reports, function(report){
+            var row = {
+                ward: ward.number,
+                address: location.address.trim(),
+                comment: report.comment.trim(),
+                date: report.date,
+                longitude: location.geoJsonPoint.coordinates[0],
+                latitude: location.geoJsonPoint.coordinates[1]
+            };
+            rows.push(row);
+            });
+        });
+    });
+
+  json2csv({data: rows, fields: ['ward', 'address', 'date', 'comment', 'longitude', 'latitude']}, function(err, csv){
     process.stdout.write(csv);
     mongoose.connection.close();
   });
