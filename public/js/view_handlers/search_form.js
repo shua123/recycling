@@ -19,21 +19,28 @@
 
       } else {
         var addressParam = formatAddressRequest(address);
-        var url = "http://maps.googleapis.com/maps/api/geocode/json?address=" + addressParam;
-
+        //var url = "http://maps.googleapis.com/maps/api/geocode/json?address=" + addressParam;
+        var url = "https://gisapps.cityofchicago.org/arcgis/rest/services/GeoStreets/GeocodeServer/findAddressCandidates?category=&outFields=*&outSR=4326&f=json&Street=&ZIP=&SingleLine=" + addressParam
+        
         /**
          * GET /geocode.json, which is a proxy to the Google
          * Maps API for getting lat/longs of an address
          */
         $.get(url)
           .done(function (gResponse){
-            var filteredResponse = filterGoogleResponse(gResponse.results);
+            //var filteredResponse = filterGoogleResponse(gResponse.candidates);
+            var responseJSON = JSON.parse(gResponse);
+            var filteredResponse = responseJSON['candidates']
+            // console.log("gResponse:")
+            // console.log(gResponse);
+            // console.log("---------------------------------Candidates:")
+            // console.log(filteredResponse['candidates']);
             // Google returns a single result
             if (filteredResponse.length == 1){
               var address = filteredResponse[0]
-                , latitude = address.geometry.location.lat
-                , longitude = address.geometry.location.lng
-                , viewVars = { formattedAddress: address.number_and_route }
+                , latitude = address.location.y
+                , longitude = address.location.x
+                , viewVars = { formattedAddress: address.attributes.StAddr }
                 ;
               /**
                * Have lat/long, querying our database for existing reports
@@ -58,7 +65,8 @@
               viewVars.possibleAddresses = filteredResponse || [];
               viewVars.buildingsFoundMessage = filteredResponse.length + " buildings found" ;
               viewVars.possibleAddresses.forEach(function (obj) {
-                obj.short_address = obj.number_and_route;
+                obj.short_address = obj.attributes.StAddr;
+                console.log(obj.short_address);
               });
               WIMR.dialog.showTemplate('search_results', viewVars);
             }
@@ -78,7 +86,8 @@
   function formatAddressRequest(inputAddress) {
     var city = 'Chicago';
     var state = 'IL';
-    return encodeURIComponent([inputAddress,city,state].join(','));
+    //return encodeURIComponent([inputAddress,city,state].join(','));
+    return encodeURIComponent([inputAddress].join(','));
   }
 
   function filterGoogleResponse(results) {

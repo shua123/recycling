@@ -61,7 +61,7 @@
 <script type="text/javascript">
     if ($('#ward-map').length) {
       var map = L.map('ward-map', {
-        maxZoom: 20
+        maxZoom: 17
       }).setView(<%- JSON.stringify(ward.centroid.coordinates); %>, 12);
       var stamenLayer = new L.StamenTileLayer("terrain");
       map.addLayer(stamenLayer);

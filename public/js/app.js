@@ -195,6 +195,10 @@
     return ret;
   };
 
+  WIMR.parseChicagoGeocoder = function(addr) {
+
+  };
+
 })(jQuery);
 
 window.onerror = function() {
